@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, Building2, MapPin, Link as LinkIcon, FileText } from 'lucide-react';
+import { Sparkles, Building2, MapPin, Link as LinkIcon, FileText, AlertTriangle, RotateCcw } from 'lucide-react';
 import { JarvisLoader } from '@/components/ui/jarvis-loader';
 
 export function JobForm() {
@@ -175,9 +175,25 @@ export function JobForm() {
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="rounded-xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-500"
+              className="error-card p-5"
             >
-              {error}
+              <div className="flex items-start gap-3">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-red-500/10">
+                  <AlertTriangle className="h-4.5 w-4.5 text-red-500" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-red-500">Analysis Failed</p>
+                  <p className="mt-1 text-sm text-red-400">{error}</p>
+                  <button
+                    type="button"
+                    onClick={() => { setError(''); }}
+                    className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-red-400 hover:text-red-300 transition-colors"
+                  >
+                    <RotateCcw className="h-3 w-3" />
+                    Dismiss and try again
+                  </button>
+                </div>
+              </div>
             </motion.div>
           )}
 

@@ -81,7 +81,7 @@ export function DashboardClient({
         <h1 className="text-3xl font-bold tracking-tight">
           Welcome back
           {email ? (
-            <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+            <span className="text-shimmer">
               {' '}{email.split('@')[0]}
             </span>
           ) : ''}

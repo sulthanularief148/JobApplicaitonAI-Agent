@@ -1,36 +1,32 @@
+import { connection } from 'next/server';
+import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import Link from 'next/link';
-import {
-  Briefcase,
-  Send,
-  MessageSquare,
-  Trophy,
-  TrendingUp,
-  FileText,
-  ArrowRight,
-  Sparkles,
-} from 'lucide-react';
 import { DashboardClient } from '@/components/dashboard/dashboard-client';
 
 export default async function DashboardPage() {
+  await connection();
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
+  if (!user) {
+    redirect('/auth/login');
+  }
+
   const [appsResult, analysesResult, cvResult] = await Promise.all([
     supabase
       .from('applications')
       .select('status')
-      .eq('user_id', user!.id),
+      .eq('user_id', user.id),
     supabase
       .from('analyses')
       .select('match_score')
-      .eq('user_id', user!.id),
+      .eq('user_id', user.id),
     supabase
       .from('cvs')
       .select('id')
-      .eq('user_id', user!.id)
+      .eq('user_id', user.id)
       .limit(1)
       .maybeSingle(),
   ]);

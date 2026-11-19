@@ -112,15 +112,19 @@ export function JarvisLoader({ message = 'Analyzing...', size = 200 }: JarvisLoa
           />
         </svg>
 
-        {/* Floating particles */}
-        {[...Array(6)].map((_, i) => (
+        {/* Floating particles — fixed positions to avoid hydration mismatch */}
+        {[
+          { left: '90%', top: '50%' },
+          { left: '70%', top: '84.6%' },
+          { left: '30%', top: '84.6%' },
+          { left: '10%', top: '50%' },
+          { left: '30%', top: '15.4%' },
+          { left: '70%', top: '15.4%' },
+        ].map((pos, i) => (
           <motion.div
             key={i}
             className="absolute h-1 w-1 rounded-full bg-primary"
-            style={{
-              left: `${50 + 40 * Math.cos((i * Math.PI * 2) / 6)}%`,
-              top: `${50 + 40 * Math.sin((i * Math.PI * 2) / 6)}%`,
-            }}
+            style={pos}
             animate={{
               opacity: [0, 1, 0],
               scale: [0.5, 1.5, 0.5],

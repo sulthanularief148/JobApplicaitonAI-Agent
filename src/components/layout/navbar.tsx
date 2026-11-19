@@ -44,7 +44,7 @@ export function Navbar() {
               <Sparkles className="h-4 w-4 text-primary" />
               <div className="absolute inset-0 rounded-lg bg-primary/5 animate-pulse-glow" />
             </div>
-            <span className="text-lg font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+            <span className="text-lg font-bold tracking-tight text-shimmer">
               ApplyWise
             </span>
           </Link>

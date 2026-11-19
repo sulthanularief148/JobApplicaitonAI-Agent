@@ -13,7 +13,10 @@ export class GeminiProvider implements AIProvider {
   constructor() {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
-      throw new Error('GEMINI_API_KEY is not set in environment variables');
+      throw new Error(
+        'Gemini API key is not configured. Please add GEMINI_API_KEY to your .env file. ' +
+        'Get a free key at https://aistudio.google.com/apikey'
+      );
     }
     this.apiKey = apiKey;
     this.model = process.env.GEMINI_MODEL || 'gemini-3.8-flash';
@@ -69,11 +72,22 @@ Please fix the response and return ONLY valid JSON matching the schema exactly.`
 
     const maxRetries = 3;
     for (let attempt = 0; attempt < maxRetries; attempt++) {
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body,
-      });
+      let response: Response;
+      try {
+        response = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body,
+        });
+      } catch (fetchErr) {
+        if (attempt < maxRetries - 1) {
+          await new Promise((r) => setTimeout(r, 2000 * (attempt + 1)));
+          continue;
+        }
+        throw new Error(
+          'Could not reach the AI service. Please check your internet connection and try again.'
+        );
+      }
 
       if (response.status === 503 && attempt < maxRetries - 1) {
         await new Promise((r) => setTimeout(r, 2000 * (attempt + 1)));
@@ -82,7 +96,21 @@ Please fix the response and return ONLY valid JSON matching the schema exactly.`
 
       if (!response.ok) {
         const errorBody = await response.text();
-        throw new Error(`Gemini API error (${response.status}): ${errorBody}`);
+        let userMessage: string;
+        if (response.status === 400) {
+          userMessage = 'The AI request was invalid. Please check your input and try again.';
+        } else if (response.status === 401 || response.status === 403) {
+          userMessage = 'AI API authentication failed. Please check the Gemini API key configuration.';
+        } else if (response.status === 404) {
+          userMessage = `AI model "${this.model}" not found. Please check the GEMINI_MODEL environment variable.`;
+        } else if (response.status === 429) {
+          userMessage = 'AI rate limit reached. Please wait a minute and try again.';
+        } else if (response.status >= 500) {
+          userMessage = 'The AI service is temporarily unavailable. Please try again in a few moments.';
+        } else {
+          userMessage = `AI analysis failed (error ${response.status}). Please try again.`;
+        }
+        throw new Error(userMessage);
       }
 
       const data = await response.json();
