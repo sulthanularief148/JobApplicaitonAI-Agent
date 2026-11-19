@@ -1,9 +1,10 @@
 'use client';
 
-// Job analysis form — user enters job details, submits for AI analysis.
-
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Sparkles, Building2, MapPin, Link as LinkIcon, FileText } from 'lucide-react';
+import { JarvisLoader } from '@/components/ui/jarvis-loader';
 
 export function JobForm() {
   const router = useRouter();
@@ -41,7 +42,6 @@ export function JobForm() {
         return;
       }
 
-      // Navigate to the results page
       router.push(`/analyze/${data.analysis.id}`);
     } catch {
       setError('Network error — please try again');
@@ -49,95 +49,149 @@ export function JobForm() {
     }
   }
 
+  const inputClass =
+    'w-full rounded-xl input-premium px-4 py-3 text-sm placeholder:text-muted-foreground focus:outline-none';
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div>
-          <label htmlFor="title" className="block text-sm font-medium mb-1.5">
-            Job Title *
-          </label>
-          <input
-            id="title"
-            value={form.title}
-            onChange={(e) => update('title', e.target.value)}
-            required
-            placeholder="e.g. Senior Frontend Engineer"
-            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          />
-        </div>
-        <div>
-          <label htmlFor="company" className="block text-sm font-medium mb-1.5">
-            Company *
-          </label>
-          <input
-            id="company"
-            value={form.company}
-            onChange={(e) => update('company', e.target.value)}
-            required
-            placeholder="e.g. Acme Corp"
-            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          />
-        </div>
-      </div>
+    <AnimatePresence mode="wait">
+      {loading ? (
+        <motion.div
+          key="loader"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.9 }}
+          className="flex flex-col items-center justify-center py-20"
+        >
+          <JarvisLoader message="AI is analyzing your match..." size={220} />
+          <motion.p
+            className="mt-6 text-sm text-muted-foreground"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1 }}
+          >
+            Comparing skills, experience, and keywords...
+          </motion.p>
+        </motion.div>
+      ) : (
+        <motion.form
+          key="form"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.5 }}
+          onSubmit={handleSubmit}
+          className="space-y-5"
+        >
+          <div className="grid gap-5 sm:grid-cols-2">
+            <div>
+              <label htmlFor="title" className="mb-2 block text-sm font-medium text-foreground/80">
+                Job Title *
+              </label>
+              <div className="relative">
+                <Sparkles className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <input
+                  id="title"
+                  value={form.title}
+                  onChange={(e) => update('title', e.target.value)}
+                  required
+                  placeholder="e.g. Senior Frontend Engineer"
+                  className={`${inputClass} pl-10`}
+                />
+              </div>
+            </div>
+            <div>
+              <label htmlFor="company" className="mb-2 block text-sm font-medium text-foreground/80">
+                Company *
+              </label>
+              <div className="relative">
+                <Building2 className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <input
+                  id="company"
+                  value={form.company}
+                  onChange={(e) => update('company', e.target.value)}
+                  required
+                  placeholder="e.g. Acme Corp"
+                  className={`${inputClass} pl-10`}
+                />
+              </div>
+            </div>
+          </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div>
-          <label htmlFor="location" className="block text-sm font-medium mb-1.5">
-            Location
-          </label>
-          <input
-            id="location"
-            value={form.location}
-            onChange={(e) => update('location', e.target.value)}
-            placeholder="e.g. Remote, New York"
-            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          />
-        </div>
-        <div>
-          <label htmlFor="url" className="block text-sm font-medium mb-1.5">
-            Job URL (optional)
-          </label>
-          <input
-            id="url"
-            value={form.url}
-            onChange={(e) => update('url', e.target.value)}
-            placeholder="https://..."
-            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          />
-        </div>
-      </div>
+          <div className="grid gap-5 sm:grid-cols-2">
+            <div>
+              <label htmlFor="location" className="mb-2 block text-sm font-medium text-foreground/80">
+                Location
+              </label>
+              <div className="relative">
+                <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <input
+                  id="location"
+                  value={form.location}
+                  onChange={(e) => update('location', e.target.value)}
+                  placeholder="e.g. Remote, New York"
+                  className={`${inputClass} pl-10`}
+                />
+              </div>
+            </div>
+            <div>
+              <label htmlFor="url" className="mb-2 block text-sm font-medium text-foreground/80">
+                Job URL (optional)
+              </label>
+              <div className="relative">
+                <LinkIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <input
+                  id="url"
+                  value={form.url}
+                  onChange={(e) => update('url', e.target.value)}
+                  placeholder="https://..."
+                  className={`${inputClass} pl-10`}
+                />
+              </div>
+            </div>
+          </div>
 
-      <div>
-        <label htmlFor="description" className="block text-sm font-medium mb-1.5">
-          Job Description *
-        </label>
-        <textarea
-          id="description"
-          value={form.description}
-          onChange={(e) => update('description', e.target.value)}
-          required
-          rows={12}
-          placeholder="Paste the full job description here..."
-          className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        />
-        <p className="mt-1 text-xs text-muted-foreground">
-          {form.description.length} characters (minimum 50)
-        </p>
-      </div>
+          <div>
+            <label htmlFor="description" className="mb-2 block text-sm font-medium text-foreground/80">
+              Job Description *
+            </label>
+            <div className="relative">
+              <FileText className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <textarea
+                id="description"
+                value={form.description}
+                onChange={(e) => update('description', e.target.value)}
+                required
+                rows={12}
+                placeholder="Paste the full job description here..."
+                className={`${inputClass} pl-10`}
+              />
+            </div>
+            <p className="mt-2 text-xs text-muted-foreground">
+              {form.description.length} characters (minimum 50)
+            </p>
+          </div>
 
-      {error && (
-        <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-400">
-          {error}
-        </div>
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="rounded-xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-500"
+            >
+              {error}
+            </motion.div>
+          )}
+
+          <motion.button
+            type="submit"
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.99 }}
+            className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all duration-300"
+          >
+            <Sparkles className="h-4 w-4" />
+            Analyze Match
+          </motion.button>
+        </motion.form>
       )}
-
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 sm:w-auto"
-      >
-        {loading ? 'Analyzing... (this takes ~15 seconds)' : 'Analyze Match'}
-      </button>
-    </form>
+    </AnimatePresence>
   );
 }

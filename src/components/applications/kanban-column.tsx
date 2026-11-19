@@ -16,6 +16,14 @@ interface KanbanColumnProps {
   onDelete: (id: string) => void;
 }
 
+const COLUMN_ACCENTS: Record<ApplicationStatus, string> = {
+  saved: 'border-t-slate-400/50',
+  applied: 'border-t-blue-400/50',
+  interview: 'border-t-amber-400/50',
+  offer: 'border-t-emerald-400/50',
+  rejected: 'border-t-red-400/50',
+};
+
 export function KanbanColumn({
   status,
   applications,
@@ -26,13 +34,13 @@ export function KanbanColumn({
 
   return (
     <div
-      className={`flex w-64 shrink-0 flex-col rounded-lg bg-muted/50 ${
-        isOver ? 'ring-2 ring-primary/50' : ''
+      className={`flex w-64 shrink-0 flex-col rounded-xl glass-card border-t-2 transition-all duration-300 ${COLUMN_ACCENTS[status]} ${
+        isOver ? 'ring-2 ring-primary/30 bg-primary/5' : ''
       }`}
     >
-      <div className="flex items-center justify-between px-3 py-2">
+      <div className="flex items-center justify-between px-4 py-3">
         <h3 className="text-sm font-semibold">{STATUS_LABELS[status]}</h3>
-        <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+        <span className="rounded-full bg-muted/50 px-2.5 py-0.5 text-xs font-semibold text-muted-foreground">
           {applications.length}
         </span>
       </div>

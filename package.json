@@ -18,6 +18,7 @@
     "@supabase/supabase-js": "^2.109.0",
     "caniuse-lite": "^1.0.30001826",
     "clsx": "^2.1.1",
+    "framer-motion": "^14.14.0",
     "lucide-react": "^1.76.0",
     "next": "16.4.6",
     "react": "19.3.0",

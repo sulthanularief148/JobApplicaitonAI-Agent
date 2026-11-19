@@ -3,9 +3,9 @@ import { createClient } from '@/lib/supabase/server';
 
 export async function PATCH(
   request: Request,
-  props: PageProps<'/api/applications/[id]'>
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await props.params;
+  const { id } = await params;
   const supabase = await createClient();
   const {
     data: { user },
@@ -63,9 +63,9 @@ export async function PATCH(
 
 export async function DELETE(
   _request: Request,
-  props: PageProps<'/api/applications/[id]'>
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await props.params;
+  const { id } = await params;
   const supabase = await createClient();
   const {
     data: { user },

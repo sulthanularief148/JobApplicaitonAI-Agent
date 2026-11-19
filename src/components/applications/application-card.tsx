@@ -36,9 +36,9 @@ export function ApplicationCard({
     <div
       ref={setNodeRef}
       style={style}
-      className={`group rounded-lg border border-border bg-card p-3 shadow-sm ${
-        isDragging ? 'opacity-50' : ''
-      } ${overlay ? 'shadow-lg ring-2 ring-primary' : ''}`}
+      className={`group rounded-xl glass-card p-3.5 transition-all duration-200 ${
+        isDragging ? 'opacity-40' : ''
+      } ${overlay ? 'shadow-xl ring-2 ring-primary/30 glow-border' : 'hover:border-primary/20'}`}
     >
       <div className="flex items-start gap-2">
         <button
@@ -53,11 +53,11 @@ export function ApplicationCard({
             onClick={() => onEdit(application)}
             className="text-left"
           >
-            <p className="font-medium leading-tight">{application.role}</p>
+            <p className="font-semibold leading-tight">{application.role}</p>
             <p className="text-sm text-muted-foreground">{application.company}</p>
           </button>
 
-          <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+          <div className="mt-2.5 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
             {application.location && (
               <span className="flex items-center gap-0.5">
                 <MapPin className="h-3 w-3" />
@@ -72,12 +72,12 @@ export function ApplicationCard({
             )}
             {application.match_score != null && (
               <span
-                className={`rounded-full px-1.5 py-0.5 font-medium ${
+                className={`rounded-full border px-2 py-0.5 font-semibold ${
                   application.match_score >= 70
-                    ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300'
+                    ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20 dark:text-emerald-400'
                     : application.match_score >= 40
-                      ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300'
-                      : 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300'
+                      ? 'bg-amber-500/10 text-amber-600 border-amber-500/20 dark:text-amber-400'
+                      : 'bg-red-500/10 text-red-600 border-red-500/20 dark:text-red-400'
                 }`}
               >
                 {application.match_score}%
@@ -87,7 +87,7 @@ export function ApplicationCard({
         </div>
         <button
           onClick={() => onDelete(application.id)}
-          className="text-muted-foreground opacity-0 transition-opacity hover:text-red-600 group-hover:opacity-100"
+          className="text-muted-foreground opacity-0 transition-all hover:text-red-500 group-hover:opacity-100"
         >
           <Trash2 className="h-3.5 w-3.5" />
         </button>

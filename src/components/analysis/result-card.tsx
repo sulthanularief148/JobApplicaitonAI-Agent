@@ -1,8 +1,8 @@
 'use client';
 
-// Result card — shows a text block with a title, content, and copy button.
-
 import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { Copy, Check } from 'lucide-react';
 
 interface ResultCardProps {
   title: string;
@@ -19,17 +19,29 @@ export function ResultCard({ title, content }: ResultCardProps) {
   }
 
   return (
-    <div className="rounded-lg border border-border bg-card p-4">
-      <div className="mb-2 flex items-center justify-between">
-        <h3 className="text-sm font-medium">{title}</h3>
-        <button
+    <div className="glass-card rounded-xl p-5 group hover:glow-border transition-all duration-300">
+      <div className="mb-3 flex items-center justify-between">
+        <h3 className="text-sm font-semibold">{title}</h3>
+        <motion.button
           onClick={handleCopy}
-          className="rounded px-2 py-1 text-xs text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all duration-300"
         >
-          {copied ? 'Copied!' : 'Copy'}
-        </button>
+          {copied ? (
+            <>
+              <Check className="h-3 w-3 text-emerald-500" />
+              <span className="text-emerald-500">Copied!</span>
+            </>
+          ) : (
+            <>
+              <Copy className="h-3 w-3" />
+              Copy
+            </>
+          )}
+        </motion.button>
       </div>
-      <p className="whitespace-pre-wrap text-sm text-foreground/80">{content}</p>
+      <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground/80">{content}</p>
     </div>
   );
 }

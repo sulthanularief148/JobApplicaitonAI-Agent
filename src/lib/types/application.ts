@@ -17,12 +17,12 @@ export const STATUS_LABELS: Record<ApplicationStatus, string> = {
 };
 
 export const STATUS_COLORS: Record<ApplicationStatus, string> = {
-  saved: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
-  applied: 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300',
+  saved: 'bg-slate-500/10 text-slate-600 border-slate-500/20 dark:text-slate-400',
+  applied: 'bg-blue-500/10 text-blue-600 border-blue-500/20 dark:text-blue-400',
   interview:
-    'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300',
-  offer: 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300',
-  rejected: 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300',
+    'bg-amber-500/10 text-amber-600 border-amber-500/20 dark:text-amber-400',
+  offer: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20 dark:text-emerald-400',
+  rejected: 'bg-red-500/10 text-red-600 border-red-500/20 dark:text-red-400',
 };
 
 export interface Application {

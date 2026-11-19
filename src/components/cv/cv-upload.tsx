@@ -1,9 +1,8 @@
 'use client';
 
-// PDF upload dropzone — lets user drag-and-drop or click to select a PDF.
-// On upload, sends it to the API which extracts text and saves it.
-
 import { useCallback, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Upload, FileText, Loader2 } from 'lucide-react';
 
 interface CVUploadProps {
   onUploadComplete: () => void;
@@ -63,16 +62,20 @@ export function CVUpload({ onUploadComplete }: CVUploadProps) {
 
   return (
     <div className="space-y-3">
-      <div
+      <motion.div
         onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
         onDragLeave={() => setDragOver(false)}
         onDrop={handleDrop}
-        className={`relative rounded-lg border-2 border-dashed p-8 text-center transition-colors ${
+        whileHover={{ scale: 1.005 }}
+        className={`relative overflow-hidden rounded-xl border-2 border-dashed p-10 text-center transition-all duration-300 ${
           dragOver
-            ? 'border-primary bg-primary/5'
-            : 'border-border hover:border-primary/50'
+            ? 'border-primary bg-primary/5 glow-border'
+            : 'border-glass-border hover:border-primary/40 hover:bg-primary/5'
         }`}
       >
+        {/* Background shimmer */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+
         <input
           type="file"
           accept=".pdf"
@@ -80,19 +83,53 @@ export function CVUpload({ onUploadComplete }: CVUploadProps) {
           className="absolute inset-0 cursor-pointer opacity-0"
           disabled={uploading}
         />
-        <div className="space-y-2">
-          <div className="text-4xl">
-            {uploading ? '...' : '+'}
-          </div>
-          <p className="text-sm font-medium">
-            {uploading ? 'Extracting text from PDF...' : 'Drop your CV here or click to browse'}
-          </p>
-          <p className="text-xs text-muted-foreground">PDF only, max 5MB</p>
-        </div>
-      </div>
+
+        <AnimatePresence mode="wait">
+          {uploading ? (
+            <motion.div
+              key="uploading"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="space-y-3"
+            >
+              <Loader2 className="mx-auto h-10 w-10 text-primary animate-spin" />
+              <p className="text-sm font-medium text-primary">Extracting text from PDF...</p>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="idle"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="space-y-3"
+            >
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
+                {dragOver ? (
+                  <FileText className="h-7 w-7 text-primary" />
+                ) : (
+                  <Upload className="h-7 w-7 text-primary" />
+                )}
+              </div>
+              <div>
+                <p className="text-sm font-medium">
+                  {dragOver ? 'Drop your CV here' : 'Drop your CV here or click to browse'}
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">PDF only, max 5MB</p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
 
       {error && (
-        <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+        <motion.p
+          initial={{ opacity: 0, y: -5 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-sm text-red-500"
+        >
+          {error}
+        </motion.p>
       )}
     </div>
   );

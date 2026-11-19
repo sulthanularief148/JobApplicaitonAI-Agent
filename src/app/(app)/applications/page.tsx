@@ -5,7 +5,9 @@ import type { Application, ApplicationStatus } from '@/lib/types/application';
 import { KanbanBoard } from '@/components/applications/kanban-board';
 import { ApplicationTable } from '@/components/applications/application-table';
 import { ApplicationModal } from '@/components/applications/application-modal';
-import { LayoutGrid, Table, Plus } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { LayoutGrid, Table, Plus, Briefcase } from 'lucide-react';
+import { JarvisLoader } from '@/components/ui/jarvis-loader';
 
 type ViewMode = 'kanban' | 'table';
 
@@ -91,75 +93,88 @@ export default function ApplicationsPage() {
     setModalOpen(true);
   }
 
-  const tabClass = (active: boolean) =>
-    `flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
-      active
-        ? 'bg-primary text-primary-foreground'
-        : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-    }`;
-
   if (loading) {
     return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Applications</h1>
-          <p className="text-muted-foreground">Loading...</p>
-        </div>
+      <div className="flex flex-col items-center justify-center py-20">
+        <JarvisLoader message="Loading applications..." size={120} />
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex flex-wrap items-center justify-between gap-4"
+      >
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Applications</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
+            <Briefcase className="h-7 w-7 text-primary" />
+            Applications
+          </h1>
+          <p className="mt-1 text-muted-foreground">
             Track your job applications across different stages.
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="flex gap-1 rounded-lg bg-muted p-1">
+        <div className="flex items-center gap-3">
+          <div className="flex gap-1 rounded-xl glass-card p-1">
             <button
-              className={tabClass(view === 'kanban')}
+              className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-300 ${
+                view === 'kanban'
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
               onClick={() => setView('kanban')}
             >
               <LayoutGrid className="h-4 w-4" />
               Board
             </button>
             <button
-              className={tabClass(view === 'table')}
+              className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-300 ${
+                view === 'table'
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
               onClick={() => setView('table')}
             >
               <Table className="h-4 w-4" />
               Table
             </button>
           </div>
-          <button
+          <motion.button
             onClick={handleAdd}
-            className="flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition-all"
           >
             <Plus className="h-4 w-4" />
             Add Application
-          </button>
+          </motion.button>
         </div>
-      </div>
+      </motion.div>
 
-      {view === 'kanban' ? (
-        <KanbanBoard
-          applications={applications}
-          onStatusChange={handleStatusChange}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-        />
-      ) : (
-        <ApplicationTable
-          applications={applications}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          onStatusChange={handleStatusChange}
-        />
-      )}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+      >
+        {view === 'kanban' ? (
+          <KanbanBoard
+            applications={applications}
+            onStatusChange={handleStatusChange}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
+        ) : (
+          <ApplicationTable
+            applications={applications}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            onStatusChange={handleStatusChange}
+          />
+        )}
+      </motion.div>
 
       <ApplicationModal
         open={modalOpen}
