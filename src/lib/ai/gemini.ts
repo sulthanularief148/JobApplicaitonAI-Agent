@@ -16,7 +16,7 @@ export class GeminiProvider implements AIProvider {
       throw new Error('GEMINI_API_KEY is not set in environment variables');
     }
     this.apiKey = apiKey;
-    this.model = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
+    this.model = process.env.GEMINI_MODEL || 'gemini-3.8-flash';
   }
 
   async analyze(cvText: string, jobDescription: string): Promise<AnalysisResponse> {
@@ -49,42 +49,52 @@ Please fix the response and return ONLY valid JSON matching the schema exactly.`
   }
 
   private async callGemini(userPrompt: string): Promise<string> {
-    // Gemini REST API — no SDK needed, just a fetch call
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${this.model}:generateContent?key=${this.apiKey}`;
-
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        system_instruction: {
-          parts: [{ text: SYSTEM_PROMPT }],
+    const body = JSON.stringify({
+      system_instruction: {
+        parts: [{ text: SYSTEM_PROMPT }],
+      },
+      contents: [
+        {
+          role: 'user',
+          parts: [{ text: userPrompt }],
         },
-        contents: [
-          {
-            role: 'user',
-            parts: [{ text: userPrompt }],
-          },
-        ],
-        generationConfig: {
-          temperature: 0.3,
-          maxOutputTokens: 4096,
-          responseMimeType: 'application/json',
-        },
-      }),
+      ],
+      generationConfig: {
+        temperature: 0.3,
+        maxOutputTokens: 4096,
+        responseMimeType: 'application/json',
+      },
     });
 
-    if (!response.ok) {
-      const errorBody = await response.text();
-      throw new Error(`Gemini API error (${response.status}): ${errorBody}`);
+    const maxRetries = 3;
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body,
+      });
+
+      if (response.status === 503 && attempt < maxRetries - 1) {
+        await new Promise((r) => setTimeout(r, 2000 * (attempt + 1)));
+        continue;
+      }
+
+      if (!response.ok) {
+        const errorBody = await response.text();
+        throw new Error(`Gemini API error (${response.status}): ${errorBody}`);
+      }
+
+      const data = await response.json();
+      const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+      if (!text) {
+        throw new Error('Gemini returned an empty response');
+      }
+
+      return text;
     }
 
-    const data = await response.json();
-    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-
-    if (!text) {
-      throw new Error('Gemini returned an empty response');
-    }
-
-    return text;
+    throw new Error('Gemini API unavailable after retries');
   }
 }

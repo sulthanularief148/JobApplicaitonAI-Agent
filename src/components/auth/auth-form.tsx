@@ -22,17 +22,27 @@ export function AuthForm() {
     const supabase = createClient();
 
     if (mode === 'signup') {
-      const { error } = await supabase.auth.signUp({
+      // Use server-side signup to bypass email confirmation
+      const res = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || 'Signup failed');
+        setLoading(false);
+        return;
+      }
+      // Auto sign-in after successful signup
+      const { error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
-        },
       });
-      if (error) {
-        setError(error.message);
+      if (signInError) {
+        setMessage('Account created! You can now log in.');
       } else {
-        setMessage('Account created! Check your email to confirm, or if email confirmation is disabled, you can log in now.');
+        window.location.href = '/dashboard';
       }
     } else {
       const { error } = await supabase.auth.signInWithPassword({
