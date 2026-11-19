@@ -1,4 +1,8 @@
-// Analyze page — placeholder for Phase 3 (job form and AI analysis).
+'use client';
+
+// Analyze page — form for pasting a job description.
+
+import { JobForm } from '@/components/analysis/job-form';
 
 export default function AnalyzePage() {
   return (
@@ -9,9 +13,7 @@ export default function AnalyzePage() {
           Paste a job description to see how well your CV matches.
         </p>
       </div>
-      <div className="rounded-lg border border-dashed border-border p-12 text-center text-muted-foreground">
-        Job analysis form coming in Phase 3
-      </div>
+      <JobForm />
     </div>
   );
 }
