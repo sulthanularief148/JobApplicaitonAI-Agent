@@ -122,6 +122,16 @@ export async function POST(request: Request) {
     );
   }
 
+  // Auto-create an application tracker entry
+  await supabase.from('applications').insert({
+    user_id: user.id,
+    analysis_id: analysis.id,
+    company,
+    role: title,
+    location: location || null,
+    status: 'saved',
+  });
+
   // Increment rate limit counter
   await incrementAnalysisCount(supabase, user.id);
 
